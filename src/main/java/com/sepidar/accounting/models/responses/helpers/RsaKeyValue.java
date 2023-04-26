@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Setter
 @XmlRootElement(name = "RSAKeyValue")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RSAKeyValue {
+public class RsaKeyValue {
 
     @XmlElement(name = "Modulus")
     private String modulus;

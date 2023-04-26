@@ -1,8 +1,6 @@
 package com.sepidar.accounting.utils;
 
-import com.google.common.base.Strings;
 import com.sepidar.accounting.exceptions.SepidarGlobalException;
-import com.sepidar.accounting.models.responses.helpers.RSAKeyValue;
 import lombok.extern.slf4j.Slf4j;
 import sun.security.rsa.RSAPublicKeyImpl;
 
@@ -11,10 +9,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +21,11 @@ import java.util.Base64;
 @Slf4j
 public class EncryptionUtil {
 
+    /**
+     * encrypts text using AES CBC mode and PKCS5 padding
+     *
+     * @return base64 encoded format of cypher text
+     */
     public static String aesEncrypt(byte[] key, byte[] iv, byte[] rawText) {
         try {
             IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
@@ -83,23 +82,6 @@ public class EncryptionUtil {
             cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKeySpec);
             return new String(Base64.getEncoder().encode(cipher.doFinal(raw)), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
-        }
-    }
-
-    public static RSAKeyValue getRSAFromXmlString(String xmlString) {
-
-        if (Strings.isNullOrEmpty(xmlString)) {
-            return null;
-        }
-
-        try {
-            StringReader sr = new StringReader(xmlString);
-            JAXBContext jaxbContext = JAXBContext.newInstance(RSAKeyValue.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (RSAKeyValue) unmarshaller.unmarshal(sr);
-        } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
             throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
         }

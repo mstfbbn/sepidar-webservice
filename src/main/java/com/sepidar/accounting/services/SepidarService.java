@@ -1,7 +1,10 @@
 package com.sepidar.accounting.services;
 
 import com.sepidar.accounting.models.SepidarConfiguration;
+import com.sepidar.accounting.models.internal.DeviceRegisterResponseDTO;
 import com.sepidar.accounting.models.requests.NewInvoiceRequest;
+import com.sepidar.accounting.models.responses.GenerationVersionResponse;
+import com.sepidar.accounting.models.responses.LoginResponse;
 import com.sepidar.accounting.services.impl.SepidarServiceImpl;
 
 public interface SepidarService {
@@ -10,11 +13,13 @@ public interface SepidarService {
         return new SepidarServiceImpl(configuration);
     }
 
-    void register();
+    DeviceRegisterResponseDTO register();
 
-    void login();
+    LoginResponse login(String xmlString);
 
-    boolean isAuthenticated();
+    boolean isAuthenticated(String xmlString, String token);
 
-    void createNewInvoice(NewInvoiceRequest request);
+    GenerationVersionResponse generationVersion();
+
+    void createNewInvoice(String xmlString, String token, NewInvoiceRequest request);
 }

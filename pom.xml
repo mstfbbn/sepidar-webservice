@@ -7,6 +7,15 @@
     <groupId>com.sepidar</groupId>
     <artifactId>accounting</artifactId>
     <version>0.1</version>
+    <description>Sepidar accounting system webservice implementation</description>
+
+    <developers>
+        <developer>
+            <id>mstfbbn</id>
+            <name>Mostafa Biabani</name>
+            <email>mostafabiabani1376@gmail.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -66,6 +75,12 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

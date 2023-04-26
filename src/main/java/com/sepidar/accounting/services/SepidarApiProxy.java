@@ -1,9 +1,10 @@
 package com.sepidar.accounting.services;
 
 import com.sepidar.accounting.models.requests.DeviceRegisterRequest;
-import com.sepidar.accounting.models.responses.DeviceRegisterResponse;
 import com.sepidar.accounting.models.requests.LoginRequest;
 import com.sepidar.accounting.models.requests.NewInvoiceRequest;
+import com.sepidar.accounting.models.responses.DeviceRegisterResponse;
+import com.sepidar.accounting.models.responses.GenerationVersionResponse;
 import com.sepidar.accounting.models.responses.InvoiceResponse;
 import com.sepidar.accounting.models.responses.LoginResponse;
 import retrofit2.Call;
@@ -22,6 +23,9 @@ public interface SepidarApiProxy {
 
     @GET("/api/IsAuthorized")
     Call<Boolean> isAuthenticated(@Header("GenerationVersion") String generationVersion, @Header("Authorization") String authorization, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode);
+
+    @GET("/api/General/GenerationVersion")
+    Call<GenerationVersionResponse> getGenerationVersion();
 
     @POST("/api/invoices")
     Call<InvoiceResponse> createNewInvoice(@Body NewInvoiceRequest request, @Header("GenerationVersion") String generationVersion, @Header("Authorization") String authorization, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode);
