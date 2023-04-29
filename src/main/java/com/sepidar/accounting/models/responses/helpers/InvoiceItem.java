@@ -1,6 +1,6 @@
 package com.sepidar.accounting.models.responses.helpers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,51 +8,51 @@ import lombok.Setter;
 @Setter
 public class InvoiceItem {
 
-    @JsonProperty("InvoiceItemID")
+    @SerializedName("InvoiceItemID")
     private Integer invoiceItemID;
 
-    @JsonProperty("ItemRef")
+    @SerializedName("ItemRef")
     private Integer itemRef;
 
-    @JsonProperty("TracingRef")
+    @SerializedName("TracingRef")
     private Integer tracingRef;
 
-    @JsonProperty("TracingTitle")
+    @SerializedName("TracingTitle")
     private String tracingTitle;
 
-    @JsonProperty("Quantity")
+    @SerializedName("Quantity")
     private Double quantity;
 
-    @JsonProperty("SecondaryQuantity")
+    @SerializedName("SecondaryQuantity")
     private Double secondaryQuantity;
 
-    @JsonProperty("Fee")
+    @SerializedName("Fee")
     private Double fee;
 
-    @JsonProperty("Price")
+    @SerializedName("Price")
     private Double price;
 
-    @JsonProperty("Discount")
+    @SerializedName("Discount")
     private Double discount;
 
-    @JsonProperty("Tax")
+    @SerializedName("Tax")
     private Double tax;
 
-    @JsonProperty("Duty")
+    @SerializedName("Duty")
     private Double duty;
 
-    @JsonProperty("Addition")
+    @SerializedName("Addition")
     private Double addition;
 
-    @JsonProperty("NetPrice")
+    @SerializedName("NetPrice")
     private Double netPrice;
 
-    @JsonProperty("DiscountInvoiceItemRef")
+    @SerializedName("DiscountInvoiceItemRef")
     private Integer discountInvoiceItemRef;
 
-    @JsonProperty("ProductPackRef")
+    @SerializedName("ProductPackRef")
     private Integer productPackRef;
 
-    @JsonProperty("ProductPackQuantity")
+    @SerializedName("ProductPackQuantity")
     private Double productPackQuantity;
 }

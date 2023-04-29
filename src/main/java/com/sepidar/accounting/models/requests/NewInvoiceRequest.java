@@ -1,6 +1,6 @@
 package com.sepidar.accounting.models.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import com.sepidar.accounting.models.requests.helpers.NewInvoiceItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,39 +15,39 @@ import java.util.List;
 @AllArgsConstructor
 public class NewInvoiceRequest {
 
-    @JsonProperty("GUID")
+    @SerializedName("GUID")
     private String GUID;
 
-    @JsonProperty("CurrencyRef")
+    @SerializedName("CurrencyRef")
     private Integer currencyRef;
 
-    @JsonProperty("CustomerRef")
+    @SerializedName("CustomerRef")
     private Integer customerRef;
 
-    @JsonProperty("AddressRef")
+    @SerializedName("AddressRef")
     private Integer addressRef;
 
-    @JsonProperty("SaleTypeRef")
+    @SerializedName("SaleTypeRef")
     private Integer saleTypeRef;
 
-    @JsonProperty("DiscountOnCustomer")
+    @SerializedName("DiscountOnCustomer")
     private Double discountOnCustomer;
 
-    @JsonProperty("Price")
+    @SerializedName("Price")
     private Double price;
 
-    @JsonProperty("Discount")
+    @SerializedName("Discount")
     private Double discount;
 
-    @JsonProperty("Tax")
+    @SerializedName("Tax")
     private Double tax;
 
-    @JsonProperty("Duty")
+    @SerializedName("Duty")
     private Double duty;
 
-    @JsonProperty("Addition")
+    @SerializedName("Addition")
     private Double addition;
 
-    @JsonProperty("Items")
+    @SerializedName("Items")
     private List<NewInvoiceItem> newInvoiceItems;
 }

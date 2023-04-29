@@ -1,6 +1,6 @@
 package com.sepidar.accounting.models.responses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,54 +8,54 @@ import lombok.Setter;
 @Setter
 public class InvoiceResponse {
 
-    @JsonProperty("InvoiceID")
+    @SerializedName("InvoiceID")
     private Integer invoiceID;
 
-    @JsonProperty("OrderRef")
+    @SerializedName("OrderRef")
     private Integer orderRef;
 
-    @JsonProperty("QuotationRef")
+    @SerializedName("QuotationRef")
     private Integer quotationRef;
 
-    @JsonProperty("Number")
+    @SerializedName("Number")
     private Integer number;
 
-    @JsonProperty("Date")
+    @SerializedName("Date")
     private String date;
 
-    @JsonProperty("CustomerRef")
+    @SerializedName("CustomerRef")
     private Integer customerRef;
 
-    @JsonProperty("CurrencyRef")
+    @SerializedName("CurrencyRef")
     private Integer currencyRef;
 
-    @JsonProperty("Rate")
+    @SerializedName("Rate")
     private Double rate;
 
-    @JsonProperty("SaleTypeRef")
+    @SerializedName("SaleTypeRef")
     private Integer saleTypeRef;
 
-    @JsonProperty("AddressRef")
+    @SerializedName("AddressRef")
     private Integer addressRef;
 
-    @JsonProperty("Price")
+    @SerializedName("Price")
     private Integer price;
 
-    @JsonProperty("Tax")
+    @SerializedName("Tax")
     private Integer tax;
 
-    @JsonProperty("Duty")
+    @SerializedName("Duty")
     private Integer duty;
 
-    @JsonProperty("Discount")
+    @SerializedName("Discount")
     private Integer discount;
 
-    @JsonProperty("Addition")
+    @SerializedName("Addition")
     private Integer addition;
 
-    @JsonProperty("NetPrice")
+    @SerializedName("NetPrice")
     private Long netPrice;
 
-    @JsonProperty("InvoiceItems")
+    @SerializedName("InvoiceItems")
     private Integer invoiceItems;
 }

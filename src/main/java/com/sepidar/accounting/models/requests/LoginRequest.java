@@ -1,6 +1,6 @@
 package com.sepidar.accounting.models.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,9 +12,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @JsonProperty("UserName")
+    @SerializedName("UserName")
     private String username;
 
-    @JsonProperty("PasswordHash")
+    @SerializedName("PasswordHash")
     private String md5HashedPassword;
 }

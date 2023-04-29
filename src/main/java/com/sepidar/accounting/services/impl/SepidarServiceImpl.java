@@ -64,7 +64,7 @@ public class SepidarServiceImpl implements SepidarService {
 
         byte[] iv = EncryptionUtil.aesGenerateRandomIv();
         String ivBase64Encoded = Base64.getEncoder().encodeToString(iv);
-        String cypher = EncryptionUtil.aesEncrypt(iv, getEncryptionKey().getBytes(), getIntegrationId().getBytes());
+        String cypher = EncryptionUtil.aesEncrypt(getEncryptionKey().getBytes(), iv, getIntegrationId().getBytes());
 
         if (Strings.isNullOrEmpty(cypher)) {
             LOGGER.error("register(req={}). cypher is null or empty for ivBase64Encoded <{}>, encryptionKey <{}>, integrationId <{}>.", requestId, ivBase64Encoded, getEncryptionKey(), getIntegrationId());
@@ -119,8 +119,8 @@ public class SepidarServiceImpl implements SepidarService {
 
         RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
 
-        String arbitraryCode = UUID.randomUUID().toString();
-        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryption(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode.getBytes());
+        UUID arbitraryCode = UUID.randomUUID();
+        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
 
         if (Strings.isNullOrEmpty(arbitraryCodeEncrypted)) {
             LOGGER.error("login(req={}). arbitraryCodeEncrypted is null or empty for arbitraryCode <{}>, base64 of rsaModulus <{}> and base64 of rsaExponent <{}>", requestId, arbitraryCode, rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent());
@@ -136,7 +136,7 @@ public class SepidarServiceImpl implements SepidarService {
                 ),
                 API_VERSION,
                 getIntegrationId(),
-                arbitraryCode,
+                arbitraryCode.toString(),
                 arbitraryCodeEncrypted
         );
 
@@ -161,8 +161,8 @@ public class SepidarServiceImpl implements SepidarService {
 
         RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
 
-        String arbitraryCode = UUID.randomUUID().toString();
-        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryption(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode.getBytes());
+        UUID arbitraryCode = UUID.randomUUID();
+        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
 
         LOGGER.info("isAuthenticated(req={}). authenticated api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}>, integrationId <{}>, token <{}>.", requestId, arbitraryCode, arbitraryCodeEncrypted, getIntegrationId(), token);
 
@@ -170,7 +170,7 @@ public class SepidarServiceImpl implements SepidarService {
                 API_VERSION,
                 token,
                 getIntegrationId(),
-                arbitraryCode,
+                arbitraryCode.toString(),
                 arbitraryCodeEncrypted
         );
 
@@ -218,15 +218,15 @@ public class SepidarServiceImpl implements SepidarService {
 
         RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
 
-        String arbitraryCode = UUID.randomUUID().toString();
-        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryption(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode.getBytes());
+        UUID arbitraryCode = UUID.randomUUID();
+        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
 
         Call<InvoiceResponse> invoiceResponseCall = getSepidarApi().createNewInvoice(
                 request,
                 API_VERSION,
                 token,
                 getIntegrationId(),
-                arbitraryCode,
+                arbitraryCode.toString(),
                 arbitraryCodeEncrypted
         );
 

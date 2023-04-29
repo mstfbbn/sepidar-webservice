@@ -1,6 +1,6 @@
 package com.sepidar.accounting.models.responses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,45 +8,45 @@ import lombok.Setter;
 @Setter
 public class LoginResponse {
 
-    @JsonProperty("Token")
+    @SerializedName("Token")
     private String token;
 
-    @JsonProperty("UserID")
+    @SerializedName("UserID")
     private Integer userId;
 
-    @JsonProperty("Title")
+    @SerializedName("Title")
     private String title;
 
-    @JsonProperty("CanEditCustomer")
+    @SerializedName("CanEditCustomer")
     private Boolean canEditCustomer;
 
-    @JsonProperty("CanRegisterCustomer")
+    @SerializedName("CanRegisterCustomer")
     private Boolean canRegisterCustomer;
 
-    @JsonProperty("CanRegisterOrder")
+    @SerializedName("CanRegisterOrder")
     private Boolean canRegisterOrder;
 
-    @JsonProperty("CanRegisterReturnOrder")
+    @SerializedName("CanRegisterReturnOrder")
     private Boolean canRegisterReturnOrder;
 
-    @JsonProperty("CanRegisterInvoice")
+    @SerializedName("CanRegisterInvoice")
     private Boolean canRegisterInvoice;
 
-    @JsonProperty("CanRegisterReturnInvoice")
+    @SerializedName("CanRegisterReturnInvoice")
     private Boolean canRegisterReturnInvoice;
 
-    @JsonProperty("CanPrintInvoice")
+    @SerializedName("CanPrintInvoice")
     private Boolean canPrintInvoice;
 
-    @JsonProperty("CanPrintReturnInvoice")
+    @SerializedName("CanPrintReturnInvoice")
     private Boolean canPrintReturnInvoice;
 
-    @JsonProperty("CanPrintInvoiceBeforeSend")
+    @SerializedName("CanPrintInvoiceBeforeSend")
     private Boolean canPrintInvoiceBeforeSend;
 
-    @JsonProperty("CanPrintReturnInvoiceBeforeSend")
+    @SerializedName("CanPrintReturnInvoiceBeforeSend")
     private Boolean canPrintReturnInvoiceBeforeSend;
 
-    @JsonProperty("CanRevokeInvoice")
+    @SerializedName("CanRevokeInvoice")
     private Boolean canRevokeInvoice;
 }

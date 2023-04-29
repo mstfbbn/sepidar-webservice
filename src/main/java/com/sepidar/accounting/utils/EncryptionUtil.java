@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
 @Slf4j
 public class EncryptionUtil {
@@ -75,12 +76,14 @@ public class EncryptionUtil {
         }
     }
 
-    public static String rsaEncryption(byte[] rsaModulus, byte[] rsaExponent, byte[] raw) {
+    public static String rsaEncryptionForUUID(byte[] rsaModulus, byte[] rsaExponent, UUID raw) {
+        byte[] uuidBytes = DatatypeConverter.parseHexBinary(Long.toHexString(raw.getMostSignificantBits()) + Long.toHexString(raw.getLeastSignificantBits()));
+
         try {
             PublicKey rsaPublicKeySpec = new RSAPublicKeyImpl(new BigInteger(1, rsaModulus), new BigInteger(1, rsaExponent));
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKeySpec);
-            return new String(Base64.getEncoder().encode(cipher.doFinal(raw)), StandardCharsets.UTF_8);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(uuidBytes));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());

@@ -1,6 +1,6 @@
 package com.sepidar.accounting.models.requests.helpers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,69 +12,69 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NewInvoiceItem {
 
-    @JsonProperty("RowID")
+    @SerializedName("RowID")
     private Integer rowID;
 
-    @JsonProperty("ItemRef")
+    @SerializedName("ItemRef")
     private Integer itemRef;
 
-    @JsonProperty("tracingRef")
+    @SerializedName("tracingRef")
     private Integer tracingRef;
 
-    @JsonProperty("StockRef")
+    @SerializedName("StockRef")
     private Integer stockRef;
 
-    @JsonProperty("Quantity")
+    @SerializedName("Quantity")
     private Double quantity;
 
-    @JsonProperty("SecondaryQuantity")
+    @SerializedName("SecondaryQuantity")
     private Double secondaryQuantity = 0.0;
 
-    @JsonProperty("Fee")
+    @SerializedName("Fee")
     private Double fee;
 
-    @JsonProperty("Price")
+    @SerializedName("Price")
     private Double price;
 
-    @JsonProperty("Description")
+    @SerializedName("Description")
     private String description;
 
-    @JsonProperty("PriceInfoPercentDiscount")
+    @SerializedName("PriceInfoPercentDiscount")
     private Double PriceInfoPercentDiscount = 0.0;
 
-    @JsonProperty("PriceInfoPriceDiscount")
+    @SerializedName("PriceInfoPriceDiscount")
     private Double PriceInfoPriceDiscount = 0.0;
 
-    @JsonProperty("PriceInfoDiscountRate")
+    @SerializedName("PriceInfoDiscountRate")
     private Double PriceInfoDiscountRate = 0.0;
 
-    @JsonProperty("AggregateAmountPercentDiscount")
+    @SerializedName("AggregateAmountPercentDiscount")
     private Double AggregateAmountPercentDiscount = 0.0;
 
-    @JsonProperty("AggregateAmountPriceDiscount")
+    @SerializedName("AggregateAmountPriceDiscount")
     private Double AggregateAmountPriceDiscount = 0.0;
 
-    @JsonProperty("AggregateAmountDiscountRate")
+    @SerializedName("AggregateAmountDiscountRate")
     private Double AggregateAmountDiscountRate = 0.0;
 
-    @JsonProperty("CustomerDiscount")
+    @SerializedName("CustomerDiscount")
     private Double CustomerDiscount = 0.0;
 
-    @JsonProperty("CustomerDiscountRate")
+    @SerializedName("CustomerDiscountRate")
     private Double CustomerDiscountRate = 0.0;
 
-    @JsonProperty("Discount")
+    @SerializedName("Discount")
     private Double Discount = 0.0;
 
-    @JsonProperty("DiscountParentRef")
+    @SerializedName("DiscountParentRef")
     private Integer DiscountParentRef;
 
-    @JsonProperty("Tax")
+    @SerializedName("Tax")
     private Double Tax;
 
-    @JsonProperty("Duty")
+    @SerializedName("Duty")
     private Double Duty;
 
-    @JsonProperty("Addition")
+    @SerializedName("Addition")
     private Double Addition;
 }
