@@ -6,6 +6,7 @@ import com.sepidar.accounting.exceptions.SepidarGlobalException;
 import com.sepidar.accounting.models.SepidarConfiguration;
 import com.sepidar.accounting.models.internal.DeviceRegisterResponseDTO;
 import com.sepidar.accounting.models.internal.RsaRawPublicKey;
+import com.sepidar.accounting.models.internal.SepidarRequestHeader;
 import com.sepidar.accounting.models.requests.DeviceRegisterRequest;
 import com.sepidar.accounting.models.requests.LoginRequest;
 import com.sepidar.accounting.models.requests.NewInvoiceRequest;
@@ -42,10 +43,6 @@ public class SepidarServiceImpl implements SepidarService {
     private final String USERNAME;
     private final String PASSWORD;
 
-    // setting RSA values to use in other APIs
-//                this.rsaExponent = ;
-//                this.rsaModulus = ;
-
     public SepidarServiceImpl(SepidarConfiguration configuration) {
         this.API_VERSION = configuration.getApiVersion();
         this.API_URL = configuration.getUrl();
@@ -54,9 +51,6 @@ public class SepidarServiceImpl implements SepidarService {
         this.PASSWORD = configuration.getPassword();
     }
 
-    /**
-     * This method assumes that configuration details are set before.
-     */
     @Override
     public DeviceRegisterResponseDTO register() {
 
@@ -67,19 +61,19 @@ public class SepidarServiceImpl implements SepidarService {
         String cypher = EncryptionUtil.aesEncrypt(getEncryptionKey().getBytes(), iv, getIntegrationId().getBytes());
 
         if (Strings.isNullOrEmpty(cypher)) {
-            LOGGER.error("register(req={}). cypher is null or empty for ivBase64Encoded <{}>, encryptionKey <{}>, integrationId <{}>.", requestId, ivBase64Encoded, getEncryptionKey(), getIntegrationId());
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, "cypher is null or empty.");
+            LOGGER.error("register(req={}). cypher is null or empty for ivBase64Encoded <{}> and integrationId <{}>.", requestId, ivBase64Encoded, getIntegrationId());
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, "cypher is null or empty in register.");
         }
 
         Call<DeviceRegisterResponse> deviceRegisterResponseCall = getSepidarApi().deviceRegister(
                 new DeviceRegisterRequest(
                         cypher,
-                        Base64.getEncoder().encodeToString(iv),
+                        ivBase64Encoded,
                         getIntegrationId()
                 )
         );
 
-        LOGGER.debug("register(req={}). api call started with base64 encoded of iv <{}>, base64 encoded of cypher <{}>, integrationId <{}>.", requestId, ivBase64Encoded, cypher, getIntegrationId());
+        LOGGER.debug("register(req={}). api call started with base64 encoded of iv <{}>, base64 encoded of cypher <{}> and integrationId <{}>.", requestId, ivBase64Encoded, cypher, getIntegrationId());
 
         try {
             Response<DeviceRegisterResponse> response = deviceRegisterResponseCall.execute();
@@ -106,9 +100,11 @@ public class SepidarServiceImpl implements SepidarService {
             } else {
                 return handleErrorResponse(response, requestId);
             }
+        } catch (SepidarGlobalException e) {
+            throw e;
         } catch (Exception e) {
-            LOGGER.error("req=(" + requestId + ") " + e.getMessage(), e);
-            throw new RuntimeException("register(req=" + requestId + "). unknown exception with message: " + e.getMessage());
+            LOGGER.error("(req=" + requestId + "). " + e.getMessage(), e);
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
         }
     }
 
@@ -117,40 +113,37 @@ public class SepidarServiceImpl implements SepidarService {
 
         String requestId = getRandomUniqueId();
 
-        RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
-
-        UUID arbitraryCode = UUID.randomUUID();
-        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
-
-        if (Strings.isNullOrEmpty(arbitraryCodeEncrypted)) {
-            LOGGER.error("login(req={}). arbitraryCodeEncrypted is null or empty for arbitraryCode <{}>, base64 of rsaModulus <{}> and base64 of rsaExponent <{}>", requestId, arbitraryCode, rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent());
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, "invalid rsa encryption.");
-        }
-
-        LOGGER.debug("login(req={}). api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}>, integrationId <{}>, username <{}>, password <{}>", requestId, arbitraryCode, arbitraryCodeEncrypted, getIntegrationId(), USERNAME, PASSWORD);
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, "");
+        LOGGER.debug("login(req={}). api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}>, integrationId <{}> and username <{}>", requestId, headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getIntegrationId(), USERNAME);
 
         Call<LoginResponse> loginResponseCall = getSepidarApi().userLogin(
                 new LoginRequest(
                         USERNAME,
                         EncryptionUtil.md5Encrypt(PASSWORD)
                 ),
-                API_VERSION,
-                getIntegrationId(),
-                arbitraryCode.toString(),
-                arbitraryCodeEncrypted
+                headers.getGenerationVersion(),
+                headers.getIntegrationId(),
+                headers.getArbitraryCode(),
+                headers.getArbitraryCodeEncoded()
         );
 
         try {
             Response<LoginResponse> response = loginResponseCall.execute();
 
             if (response.isSuccessful()) {
-                LOGGER.debug("login(req={}). login api responded with userId <{}>, title <{}>, canRegisterInvoice <{}>.", requestId, response.body().getUserId(), response.body().getTitle(), response.body().getCanRegisterInvoice());
+                if (response.body() == null) {
+                    LOGGER.error("login(req={}). api responded with null body", requestId);
+                    throw new SepidarGlobalException(response.code(), 0, "sepidar response is successful but body is null");
+                }
+                LOGGER.debug("login(req={}). api responded with userId <{}>, title <{}>.", requestId, response.body().getUserId(), response.body().getTitle());
                 return response.body();
             }
             return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
         } catch (Exception e) {
-            LOGGER.error("req=(" + requestId + ")" + e.getMessage(), e);
-            throw new RuntimeException("login(req=" + requestId + "). unknown exception with message: " + e.getMessage());
+            LOGGER.error("(req=" + requestId + "). " + e.getMessage(), e);
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
         }
     }
 
@@ -159,33 +152,30 @@ public class SepidarServiceImpl implements SepidarService {
 
         String requestId = getRandomUniqueId();
 
-        RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
-
-        UUID arbitraryCode = UUID.randomUUID();
-        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
-
-        LOGGER.info("isAuthenticated(req={}). authenticated api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}>, integrationId <{}>, token <{}>.", requestId, arbitraryCode, arbitraryCodeEncrypted, getIntegrationId(), token);
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        LOGGER.info("isAuthenticated(req={}). authenticated api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}> and integrationId <{}>.", requestId, headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getIntegrationId());
 
         Call<Boolean> authenticatedResponseCall = getSepidarApi().isAuthenticated(
-                API_VERSION,
-                token,
-                getIntegrationId(),
-                arbitraryCode.toString(),
-                arbitraryCodeEncrypted
+                headers.getGenerationVersion(),
+                headers.getToken(),
+                headers.getIntegrationId(),
+                headers.getArbitraryCode(),
+                headers.getArbitraryCodeEncoded()
         );
 
         try {
             Response<Boolean> response = authenticatedResponseCall.execute();
             if (response.isSuccessful()) {
-                LOGGER.info("authenticated(req={}). token is valid.", requestId);
+                LOGGER.debug("authenticated(req={}). token is valid.", requestId);
                 return true;
-            } else {
-                LOGGER.error("authenticated(req={}). isAuthenticated api responded with error code <{}> and message <{}>", requestId, response.code(), (response.errorBody() == null) ? null : response.errorBody().string());
-                return false;
             }
+            LOGGER.debug("authenticated(req={}). isAuthenticated api responded with error code <{}> and message <{}>", requestId, response.code(), (response.errorBody() == null) ? null : response.errorBody().string());
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
         } catch (Exception e) {
-            LOGGER.error("req=" + requestId + ")" + e.getMessage(), e);
-            throw new RuntimeException("authenticated(req=" + requestId + "). unknown exception with message: " + e.getMessage());
+            LOGGER.error("(req=" + requestId + "). " + e.getMessage(), e);
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
         }
     }
 
@@ -213,21 +203,18 @@ public class SepidarServiceImpl implements SepidarService {
 
         if (request == null || Strings.isNullOrEmpty(request.getGUID())) {
             LOGGER.error("createNewInvoice(req={}). either newInvoiceRequest <{}> is null or GUID is null or empty.", requestId, request);
-            throw new RuntimeException("request or guid is null or empty.");
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_BAD_REQUEST, 0, "request or guid is null or empty.");
         }
 
-        RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
-
-        UUID arbitraryCode = UUID.randomUUID();
-        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
 
         Call<InvoiceResponse> invoiceResponseCall = getSepidarApi().createNewInvoice(
                 request,
-                API_VERSION,
-                token,
-                getIntegrationId(),
-                arbitraryCode.toString(),
-                arbitraryCodeEncrypted
+                headers.getGenerationVersion(),
+                headers.getToken(),
+                headers.getIntegrationId(),
+                headers.getArbitraryCode(),
+                headers.getArbitraryCodeEncoded()
         );
 
         try {
@@ -289,6 +276,18 @@ public class SepidarServiceImpl implements SepidarService {
             LOGGER.error("handleErrorResponse(req={}). error happened parsing errorBody with message <{}>", requestId, exception.getMessage());
             throw new SepidarGlobalException(response.code(), 0, exception.getMessage());
         }
+    }
+
+    private SepidarRequestHeader getRequestHeader(String requestId, String xmlString, String token) {
+        RsaRawPublicKey rsaRawPublicKey = getRSAFromXmlString(xmlString, requestId);
+        UUID arbitraryCode = UUID.randomUUID();
+        String arbitraryCodeEncrypted = EncryptionUtil.rsaEncryptionForUUID(rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent(), arbitraryCode);
+        if (Strings.isNullOrEmpty(arbitraryCodeEncrypted)) {
+            LOGGER.error("getRequestHeader(req={}). arbitraryCodeEncrypted is null or empty for arbitraryCode <{}>, base64 of rsaModulus <{}> and base64 of rsaExponent <{}>", requestId, arbitraryCode, rsaRawPublicKey.getModulus(), rsaRawPublicKey.getExponent());
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, "invalid rsa encryption.");
+        }
+
+        return SepidarRequestHeader.of(API_VERSION, getIntegrationId(), arbitraryCode.toString(), arbitraryCodeEncrypted, "Bearer " + token);
     }
 
     private SepidarApiProxy getSepidarApi() {
