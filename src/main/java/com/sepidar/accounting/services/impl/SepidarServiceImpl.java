@@ -2,16 +2,24 @@ package com.sepidar.accounting.services.impl;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
+import com.sepidar.accounting.constants.AdministrativeDivisionType;
 import com.sepidar.accounting.exceptions.SepidarGlobalException;
-import com.sepidar.accounting.models.SepidarConfiguration;
-import com.sepidar.accounting.models.internal.DeviceRegisterResponseDTO;
-import com.sepidar.accounting.models.internal.RsaRawPublicKey;
-import com.sepidar.accounting.models.internal.SepidarRequestHeader;
-import com.sepidar.accounting.models.requests.DeviceRegisterRequest;
-import com.sepidar.accounting.models.requests.LoginRequest;
-import com.sepidar.accounting.models.requests.NewInvoiceRequest;
-import com.sepidar.accounting.models.responses.*;
-import com.sepidar.accounting.models.responses.helpers.RsaKeyValue;
+import com.sepidar.accounting.models.administrative_divisions.AdministrativeDivision;
+import com.sepidar.accounting.models.administrative_divisions.AdministrativeDivisionDTO;
+import com.sepidar.accounting.models.authentication.*;
+import com.sepidar.accounting.models.common.ErrorResponse;
+import com.sepidar.accounting.models.common.SepidarConfiguration;
+import com.sepidar.accounting.models.common.SepidarRequestHeader;
+import com.sepidar.accounting.models.customer.Customer;
+import com.sepidar.accounting.models.customer.CustomerAdd;
+import com.sepidar.accounting.models.customer.CustomerEdit;
+import com.sepidar.accounting.models.customer.CustomerGrouping;
+import com.sepidar.accounting.models.general.GenerationVersion;
+import com.sepidar.accounting.models.invoice.InvoiceResponse;
+import com.sepidar.accounting.models.invoice.NewInvoiceRequest;
+import com.sepidar.accounting.models.property.Property;
+import com.sepidar.accounting.models.stock.Stock;
+import com.sepidar.accounting.models.unit.Unit;
 import com.sepidar.accounting.services.SepidarApiProxy;
 import com.sepidar.accounting.services.SepidarService;
 import com.sepidar.accounting.utils.EncryptionUtil;
@@ -29,7 +37,9 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * NOTE: every method assumes that configuration details are set before.
@@ -40,20 +50,15 @@ public class SepidarServiceImpl implements SepidarService {
     private final String API_VERSION;
     private final String API_URL;
     private final String DEVICE_SERIAL_ID;
-    private final String USERNAME;
-    private final String PASSWORD;
 
     public SepidarServiceImpl(SepidarConfiguration configuration) {
         this.API_VERSION = configuration.getApiVersion();
         this.API_URL = configuration.getUrl();
         this.DEVICE_SERIAL_ID = configuration.getDeviceId();
-        this.USERNAME = configuration.getUsername();
-        this.PASSWORD = configuration.getPassword();
     }
 
     @Override
     public DeviceRegisterResponseDTO register() {
-
         String requestId = getRandomUniqueId();
 
         byte[] iv = EncryptionUtil.aesGenerateRandomIv();
@@ -97,9 +102,8 @@ public class SepidarServiceImpl implements SepidarService {
                 }
 
                 return DeviceRegisterResponseDTO.of(xmlString, response.body().getDeviceTitle());
-            } else {
-                return handleErrorResponse(response, requestId);
             }
+            return handleErrorResponse(response, requestId);
         } catch (SepidarGlobalException e) {
             throw e;
         } catch (Exception e) {
@@ -109,22 +113,21 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public LoginResponse login(String xmlString) {
-
+    public LoginResponse login(String rsaPublicKeyXmlString, String username, String password) {
         String requestId = getRandomUniqueId();
 
-        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, "");
-        LOGGER.debug("login(req={}). api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}>, integrationId <{}> and username <{}>", requestId, headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getIntegrationId(), USERNAME);
+        SepidarRequestHeader headers = getRequestHeader(requestId, rsaPublicKeyXmlString, "");
+        LOGGER.debug("login(req={}). api call started with arbitraryCode <{}>, arbitraryCodeEncrypted <{}>, integrationId <{}> and username <{}>", requestId, headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getIntegrationId(), username);
 
         Call<LoginResponse> loginResponseCall = getSepidarApi().userLogin(
-                new LoginRequest(
-                        USERNAME,
-                        EncryptionUtil.md5Encrypt(PASSWORD)
-                ),
                 headers.getGenerationVersion(),
                 headers.getIntegrationId(),
                 headers.getArbitraryCode(),
-                headers.getArbitraryCodeEncoded()
+                headers.getArbitraryCodeEncoded(),
+                new LoginRequest(
+                        username,
+                        EncryptionUtil.md5Encrypt(password)
+                )
         );
 
         try {
@@ -149,7 +152,6 @@ public class SepidarServiceImpl implements SepidarService {
 
     @Override
     public boolean isAuthenticated(String xmlString, String token) {
-
         String requestId = getRandomUniqueId();
 
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
@@ -166,8 +168,7 @@ public class SepidarServiceImpl implements SepidarService {
         try {
             Response<Boolean> response = authenticatedResponseCall.execute();
             if (response.isSuccessful()) {
-                LOGGER.debug("authenticated(req={}). token is valid.", requestId);
-                return true;
+                return response.body();
             }
             LOGGER.debug("authenticated(req={}). isAuthenticated api responded with error code <{}> and message <{}>", requestId, response.code(), (response.errorBody() == null) ? null : response.errorBody().string());
             return handleErrorResponse(response, requestId);
@@ -180,20 +181,188 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public GenerationVersionResponse generationVersion() {
-
+    public GenerationVersion generationVersion() {
         String requestId = getRandomUniqueId();
-
-        Call<GenerationVersionResponse> generationVersionCall = getSepidarApi().getGenerationVersion();
+        Call<GenerationVersion> generationVersionCall = getSepidarApi().getGenerationVersion();
         try {
-            Response<GenerationVersionResponse> response = generationVersionCall.execute();
+            Response<GenerationVersion> response = generationVersionCall.execute();
             if (response.isSuccessful()) {
                 return response.body();
             }
             return handleErrorResponse(response, requestId);
-
         } catch (IOException ioException) {
             throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, ioException.getMessage());
+        }
+    }
+
+    @Override
+    public List<AdministrativeDivisionDTO> administrativeDivision(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<AdministrativeDivision>> administrativeDivisionCall = getSepidarApi().getAdministrativeDivisions(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<AdministrativeDivision>> response = administrativeDivisionCall.execute();
+            if (response.isSuccessful()) {
+                assert response.body() != null;
+                return response.body().stream()
+                        .map(item ->
+                                AdministrativeDivisionDTO.of(
+                                        item.getDivisionId(), item.getTitle(), AdministrativeDivisionType.of(item.getType()), item.getParentDivisionRef())
+                        )
+                        .collect(Collectors.toList());
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<CustomerGrouping> customerGroupings(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<CustomerGrouping>> customerGroupingCall = getSepidarApi().getCustomerGroupings(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<CustomerGrouping>> response = customerGroupingCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<Customer> customers(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<Customer>> customerCall = getSepidarApi().getCustomers(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<Customer>> response = customerCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public Customer customer(String xmlString, String token, Integer customerId) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<Customer> customerCall = getSepidarApi().getCustomer(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), customerId);
+        try {
+            Response<Customer> response = customerCall.execute();
+            if (response.isSuccessful()) {
+                // TODO: add mapper for customer
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public Customer customerAdd(String xmlString, String token, CustomerAdd customerAdd) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<Customer> customerAddCall = getSepidarApi().newCustomer(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), customerAdd);
+        try {
+            Response<Customer> response = customerAddCall.execute();
+            if (response.isSuccessful()) {
+                // TODO: add mapper for customer
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public Customer customerEdit(String xmlString, String token, CustomerEdit customerEdit) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<Customer> customerEditCall = getSepidarApi().editCustomer(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), customerEdit);
+        try {
+            Response<Customer> response = customerEditCall.execute();
+            if (response.isSuccessful()) {
+                // TODO: add mapper for customer
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<Unit> getUnits(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<Unit>> unitsCall = getSepidarApi().getUnits(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<Unit>> response = unitsCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<Property> getProperties(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<Property>> propertyCall = getSepidarApi().getProperties(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<Property>> response = propertyCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<Stock> getStocks(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<Stock>> stockCall = getSepidarApi().getStocks(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<Stock>> response = stockCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
         }
     }
 
@@ -232,7 +401,7 @@ public class SepidarServiceImpl implements SepidarService {
         }
     }
 
-    public static RsaRawPublicKey getRSAFromXmlString(String xmlString, String requestId) {
+    private static RsaRawPublicKey getRSAFromXmlString(String xmlString, String requestId) {
 
         if (Strings.isNullOrEmpty(xmlString)) {
             throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, "xmlString is null or empty");

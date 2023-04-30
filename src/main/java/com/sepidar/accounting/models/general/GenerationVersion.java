@@ -1,4 +1,4 @@
-package com.sepidar.accounting.models.responses;
+package com.sepidar.accounting.models.general;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GenerationVersionResponse {
+public class GenerationVersion {
 
     @SerializedName("GenerationVersion")
     private String generationVersion;

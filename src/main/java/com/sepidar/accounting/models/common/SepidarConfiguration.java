@@ -1,4 +1,4 @@
-package com.sepidar.accounting.models;
+package com.sepidar.accounting.models.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +16,4 @@ public class SepidarConfiguration {
     private String apiVersion = "101";
     private String url = "http://localhost:7373";
     private String deviceId = "1000aaaa";
-    private String username;
-    private String password;
 }

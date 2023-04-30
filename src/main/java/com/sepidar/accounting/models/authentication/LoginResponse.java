@@ -1,4 +1,4 @@
-package com.sepidar.accounting.models.responses;
+package com.sepidar.accounting.models.authentication;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;

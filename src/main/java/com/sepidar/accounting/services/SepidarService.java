@@ -1,11 +1,21 @@
 package com.sepidar.accounting.services;
 
-import com.sepidar.accounting.models.SepidarConfiguration;
-import com.sepidar.accounting.models.internal.DeviceRegisterResponseDTO;
-import com.sepidar.accounting.models.requests.NewInvoiceRequest;
-import com.sepidar.accounting.models.responses.GenerationVersionResponse;
-import com.sepidar.accounting.models.responses.LoginResponse;
+import com.sepidar.accounting.models.administrative_divisions.AdministrativeDivisionDTO;
+import com.sepidar.accounting.models.authentication.DeviceRegisterResponseDTO;
+import com.sepidar.accounting.models.authentication.LoginResponse;
+import com.sepidar.accounting.models.common.SepidarConfiguration;
+import com.sepidar.accounting.models.customer.Customer;
+import com.sepidar.accounting.models.customer.CustomerAdd;
+import com.sepidar.accounting.models.customer.CustomerEdit;
+import com.sepidar.accounting.models.customer.CustomerGrouping;
+import com.sepidar.accounting.models.general.GenerationVersion;
+import com.sepidar.accounting.models.invoice.NewInvoiceRequest;
+import com.sepidar.accounting.models.property.Property;
+import com.sepidar.accounting.models.stock.Stock;
+import com.sepidar.accounting.models.unit.Unit;
 import com.sepidar.accounting.services.impl.SepidarServiceImpl;
+
+import java.util.List;
 
 public interface SepidarService {
 
@@ -15,11 +25,29 @@ public interface SepidarService {
 
     DeviceRegisterResponseDTO register();
 
-    LoginResponse login(String xmlString);
+    LoginResponse login(String rsaPublicKeyXmlString, String username, String password);
 
     boolean isAuthenticated(String xmlString, String token);
 
-    GenerationVersionResponse generationVersion();
+    GenerationVersion generationVersion();
+
+    List<AdministrativeDivisionDTO> administrativeDivision(String xmlString, String token);
+
+    List<CustomerGrouping> customerGroupings(String xmlString, String token);
+
+    List<Customer> customers(String xmlString, String token);
+
+    Customer customer(String xmlString, String token, Integer customerId);
+
+    Customer customerAdd(String xmlString, String token, CustomerAdd customerAdd);
+
+    Customer customerEdit(String xmlString, String token, CustomerEdit customerEdit);
+
+    List<Unit> getUnits(String xmlString, String token);
+
+    List<Property> getProperties(String xmlString, String token);
+
+    List<Stock> getStocks(String xmlString, String token);
 
     void createNewInvoice(String xmlString, String token, NewInvoiceRequest request);
 }

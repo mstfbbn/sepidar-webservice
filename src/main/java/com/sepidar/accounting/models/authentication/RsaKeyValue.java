@@ -1,4 +1,4 @@
-package com.sepidar.accounting.models.responses.helpers;
+package com.sepidar.accounting.models.authentication;
 
 import lombok.Getter;
 import lombok.Setter;

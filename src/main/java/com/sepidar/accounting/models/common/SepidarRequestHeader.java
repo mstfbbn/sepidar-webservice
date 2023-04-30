@@ -1,4 +1,4 @@
-package com.sepidar.accounting.models.internal;
+package com.sepidar.accounting.models.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

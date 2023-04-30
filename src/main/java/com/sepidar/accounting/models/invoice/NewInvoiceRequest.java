@@ -1,7 +1,6 @@
-package com.sepidar.accounting.models.requests;
+package com.sepidar.accounting.models.invoice;
 
 import com.google.gson.annotations.SerializedName;
-import com.sepidar.accounting.models.requests.helpers.NewInvoiceItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
