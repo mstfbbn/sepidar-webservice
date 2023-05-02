@@ -17,6 +17,8 @@ import com.sepidar.accounting.models.customer.CustomerGrouping;
 import com.sepidar.accounting.models.general.GenerationVersion;
 import com.sepidar.accounting.models.invoice.InvoiceResponse;
 import com.sepidar.accounting.models.invoice.NewInvoiceRequest;
+import com.sepidar.accounting.models.item.Inventory;
+import com.sepidar.accounting.models.item.Item;
 import com.sepidar.accounting.models.property.Property;
 import com.sepidar.accounting.models.stock.Stock;
 import com.sepidar.accounting.models.unit.Unit;
@@ -355,6 +357,60 @@ public class SepidarServiceImpl implements SepidarService {
         Call<List<Stock>> stockCall = getSepidarApi().getStocks(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
         try {
             Response<List<Stock>> response = stockCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<Item> getItems(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<Item>> itemCall = getSepidarApi().getItems(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<Item>> response = itemCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public String getItemImage(String xmlString, String token, Integer itemId) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<String> itemImageCall = getSepidarApi().getItemImage(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), itemId);
+        try {
+            Response<String> response = itemImageCall.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+            return handleErrorResponse(response, requestId);
+        } catch (SepidarGlobalException e) {
+            throw e;
+        } catch (Exception exception) {
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<Inventory> getInventories(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<Inventory>> inventoryCall = getSepidarApi().getInventories(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        try {
+            Response<List<Inventory>> response = inventoryCall.execute();
             if (response.isSuccessful()) {
                 return response.body();
             }

@@ -10,6 +10,8 @@ import com.sepidar.accounting.models.customer.CustomerEdit;
 import com.sepidar.accounting.models.customer.CustomerGrouping;
 import com.sepidar.accounting.models.general.GenerationVersion;
 import com.sepidar.accounting.models.invoice.NewInvoiceRequest;
+import com.sepidar.accounting.models.item.Inventory;
+import com.sepidar.accounting.models.item.Item;
 import com.sepidar.accounting.models.property.Property;
 import com.sepidar.accounting.models.stock.Stock;
 import com.sepidar.accounting.models.unit.Unit;
@@ -48,6 +50,12 @@ public interface SepidarService {
     List<Property> getProperties(String xmlString, String token);
 
     List<Stock> getStocks(String xmlString, String token);
+
+    List<Item> getItems(String xmlString, String token);
+
+    String getItemImage(String xmlString, String token, Integer itemId);
+
+    List<Inventory> getInventories(String xmlString, String token);
 
     void createNewInvoice(String xmlString, String token, NewInvoiceRequest request);
 }

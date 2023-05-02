@@ -12,6 +12,8 @@ import com.sepidar.accounting.models.customer.CustomerGrouping;
 import com.sepidar.accounting.models.general.GenerationVersion;
 import com.sepidar.accounting.models.invoice.InvoiceResponse;
 import com.sepidar.accounting.models.invoice.NewInvoiceRequest;
+import com.sepidar.accounting.models.item.Inventory;
+import com.sepidar.accounting.models.item.Item;
 import com.sepidar.accounting.models.property.Property;
 import com.sepidar.accounting.models.stock.Stock;
 import com.sepidar.accounting.models.unit.Unit;
@@ -60,6 +62,15 @@ public interface SepidarApiProxy {
 
     @GET("/api/Stocks")
     Call<List<Stock>> getStocks(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);
+
+    @GET("/api/Items")
+    Call<List<Item>> getItems(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);
+
+    @GET("/api/Items/{itemID}/Image/")
+    Call<String> getItemImage(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization, @Path("itemID") Integer itemId);
+
+    @GET("/api/Items/Inventories/")
+    Call<List<Inventory>> getInventories(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);
 
     @POST("/api/invoices")
     Call<InvoiceResponse> createNewInvoice(@Body NewInvoiceRequest request, @Header("GenerationVersion") String generationVersion, @Header("Authorization") String authorization, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode);
