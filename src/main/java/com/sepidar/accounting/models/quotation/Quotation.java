@@ -1,21 +1,27 @@
-package com.sepidar.accounting.models.invoice;
+package com.sepidar.accounting.models.quotation;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class NewInvoiceRequest {
+public class Quotation {
+
+    @SerializedName("ID")
+    private Integer id;
 
     @SerializedName("GUID")
-    private String GUID;
+    private String guid;
+
+    @SerializedName("Number")
+    private Integer number;
+
+    @SerializedName("Date")
+    private Date date;
 
     @SerializedName("CurrencyRef")
     private Integer currencyRef;
@@ -47,6 +53,9 @@ public class NewInvoiceRequest {
     @SerializedName("Addition")
     private Double addition;
 
+    @SerializedName("NetPrice")
+    private Double netPrice;
+
     @SerializedName("Items")
-    private List<NewInvoiceItem> newInvoiceItems;
+    private List<QuotationItem> items;
 }

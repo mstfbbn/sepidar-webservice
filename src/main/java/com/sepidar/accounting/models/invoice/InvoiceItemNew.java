@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewInvoiceItem {
+public class InvoiceItemNew {
 
     @SerializedName("RowID")
     private Integer rowID;

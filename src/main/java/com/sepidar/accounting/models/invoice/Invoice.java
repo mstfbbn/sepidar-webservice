@@ -4,9 +4,11 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class InvoiceResponse {
+public class Invoice {
 
     @SerializedName("InvoiceID")
     private Integer invoiceID;
@@ -39,23 +41,23 @@ public class InvoiceResponse {
     private Integer addressRef;
 
     @SerializedName("Price")
-    private Integer price;
+    private Double price;
 
     @SerializedName("Tax")
-    private Integer tax;
+    private Double tax;
 
     @SerializedName("Duty")
-    private Integer duty;
+    private Double duty;
 
     @SerializedName("Discount")
-    private Integer discount;
+    private Double discount;
 
     @SerializedName("Addition")
-    private Integer addition;
+    private Double addition;
 
     @SerializedName("NetPrice")
-    private Long netPrice;
+    private Double netPrice;
 
     @SerializedName("InvoiceItems")
-    private Integer invoiceItems;
+    private List<InvoiceItem> invoiceItems;
 }
