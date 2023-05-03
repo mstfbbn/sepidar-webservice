@@ -3,11 +3,11 @@ package com.sepidar.accounting;
 import com.google.gson.Gson;
 import com.sepidar.accounting.models.common.ErrorResponse;
 import com.sepidar.accounting.models.common.SepidarConfiguration;
+import com.sepidar.accounting.models.general.GenerationVersion;
 import com.sepidar.accounting.services.SepidarService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -25,9 +25,9 @@ class MainTest {
 
     @Test
     void main() {
-        SepidarService sepidarService = SepidarService.getInstance(SepidarConfiguration.of("109", "http://192.168.0.95:7373", "100075b9"));
-        boolean authenticated = sepidarService.isAuthenticated("<RSAKeyValue><Modulus>9uIlk6iZyZT341H9I2cjFLE83gyTRjYQcMas8MblHIuU3f1tKTX1VE5A6EycKvUYO5p9KI6BjJeuSeh5Nercyw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQ1LCJwaWQiOm51bGwsInV2ZXIiOjMsImR1cGlkIjoxLCJkdXB2ZXIiOjF9.D2LubfzcwE-zKGJUmfQXOEXGw_JTHrjKEymFt4");
-
+        SepidarService sepidarService = SepidarService.getInstance(SepidarConfiguration.of("101", "http://localhost:7373", "1000aaaa"));
+        GenerationVersion generationVersion = sepidarService.generationVersion();
+        assertEquals("101", generationVersion.getGenerationVersion());
     }
 
     @Test

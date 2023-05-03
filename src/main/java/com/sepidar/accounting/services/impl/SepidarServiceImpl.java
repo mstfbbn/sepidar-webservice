@@ -172,10 +172,10 @@ public class SepidarServiceImpl implements SepidarService {
 
         Call<Boolean> authenticatedResponseCall = getSepidarApi().isAuthenticated(
                 headers.getGenerationVersion(),
-                headers.getToken(),
                 headers.getIntegrationId(),
                 headers.getArbitraryCode(),
-                headers.getArbitraryCodeEncoded()
+                headers.getArbitraryCodeEncoded(),
+                headers.getToken()
         );
 
         try {
