@@ -26,7 +26,7 @@ class MainTest {
     @Test
     void main() {
         SepidarService sepidarService = SepidarService.getInstance(SepidarConfiguration.of("101", "http://localhost:7373", "1000aaaa"));
-        GenerationVersion generationVersion = sepidarService.generationVersion();
+        GenerationVersion generationVersion = sepidarService.getGenerationVersion();
         assertEquals("101", generationVersion.getGenerationVersion());
     }
 

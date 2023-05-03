@@ -194,7 +194,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public GenerationVersion generationVersion() {
+    public GenerationVersion getGenerationVersion() {
         String requestId = getRandomUniqueId();
         Call<GenerationVersion> generationVersionCall = getSepidarApi().getGenerationVersion();
         try {
@@ -209,7 +209,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public List<AdministrativeDivisionDTO> administrativeDivision(String xmlString, String token) {
+    public List<AdministrativeDivisionDTO> getAdministrativeDivisions(String xmlString, String token) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
         Call<List<AdministrativeDivision>> administrativeDivisionCall = getSepidarApi().getAdministrativeDivisions(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
@@ -233,7 +233,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public List<CustomerGrouping> customerGroupings(String xmlString, String token) {
+    public List<CustomerGrouping> getCustomerGroupings(String xmlString, String token) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
         Call<List<CustomerGrouping>> customerGroupingCall = getSepidarApi().getCustomerGroupings(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
@@ -251,7 +251,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public List<Customer> customers(String xmlString, String token) {
+    public List<Customer> getCustomers(String xmlString, String token) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
         Call<List<Customer>> customerCall = getSepidarApi().getCustomers(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
@@ -269,7 +269,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public Customer customer(String xmlString, String token, Integer customerId) {
+    public Customer getCustomer(String xmlString, String token, Integer customerId) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
         Call<Customer> customerCall = getSepidarApi().getCustomer(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), customerId);
@@ -288,7 +288,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public Customer customerAdd(String xmlString, String token, CustomerAdd customerAdd) {
+    public Customer createCustomer(String xmlString, String token, CustomerAdd customerAdd) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
         Call<Customer> customerAddCall = getSepidarApi().newCustomer(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), customerAdd);
@@ -307,7 +307,7 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
-    public Customer customerEdit(String xmlString, String token, CustomerEdit customerEdit) {
+    public Customer editCustomer(String xmlString, String token, CustomerEdit customerEdit) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
         Call<Customer> customerEditCall = getSepidarApi().editCustomer(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), customerEdit);

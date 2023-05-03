@@ -43,19 +43,19 @@ public interface SepidarService {
 
     boolean isAuthenticated(String xmlString, String token);
 
-    GenerationVersion generationVersion();
+    GenerationVersion getGenerationVersion();
 
-    List<AdministrativeDivisionDTO> administrativeDivision(String xmlString, String token);
+    List<AdministrativeDivisionDTO> getAdministrativeDivisions(String xmlString, String token);
 
-    List<CustomerGrouping> customerGroupings(String xmlString, String token);
+    List<CustomerGrouping> getCustomerGroupings(String xmlString, String token);
 
-    List<Customer> customers(String xmlString, String token);
+    List<Customer> getCustomers(String xmlString, String token);
 
-    Customer customer(String xmlString, String token, Integer customerId);
+    Customer getCustomer(String xmlString, String token, Integer customerId);
 
-    Customer customerAdd(String xmlString, String token, CustomerAdd customerAdd);
+    Customer createCustomer(String xmlString, String token, CustomerAdd customerAdd);
 
-    Customer customerEdit(String xmlString, String token, CustomerEdit customerEdit);
+    Customer editCustomer(String xmlString, String token, CustomerEdit customerEdit);
 
     List<Unit> getUnits(String xmlString, String token);
 
