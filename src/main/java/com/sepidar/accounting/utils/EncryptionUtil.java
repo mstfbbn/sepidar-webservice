@@ -31,12 +31,9 @@ public class EncryptionUtil {
         try {
             IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
-
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
-
             byte[] encrypted = cipher.doFinal(rawText);
-
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -58,7 +55,6 @@ public class EncryptionUtil {
     }
 
     public static byte[] aesGenerateRandomIv() {
-
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
         return iv;
@@ -78,7 +74,6 @@ public class EncryptionUtil {
 
     public static String rsaEncryptionForUUID(byte[] rsaModulus, byte[] rsaExponent, UUID raw) {
         byte[] uuidBytes = DatatypeConverter.parseHexBinary(Long.toHexString(raw.getMostSignificantBits()) + Long.toHexString(raw.getLeastSignificantBits()));
-
         try {
             PublicKey rsaPublicKeySpec = new RSAPublicKeyImpl(new BigInteger(1, rsaModulus), new BigInteger(1, rsaExponent));
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");

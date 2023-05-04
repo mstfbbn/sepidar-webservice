@@ -1,7 +1,11 @@
 package com.sepidar.accounting.constants;
 
-public enum ItemType {
+import lombok.Getter;
 
+import java.util.Arrays;
+
+@Getter
+public enum ItemType {
     PRODUCT(1),
     SERVICE(2),
     PROPERTY(3);
@@ -10,5 +14,9 @@ public enum ItemType {
 
     ItemType(Integer value) {
         this.value = value;
+    }
+
+    public static ItemType of(Integer value) {
+        return Arrays.stream(ItemType.values()).filter(item -> item.value.equals(value)).findFirst().orElse(null);
     }
 }

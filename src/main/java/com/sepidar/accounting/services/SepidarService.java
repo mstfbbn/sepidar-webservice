@@ -1,6 +1,6 @@
 package com.sepidar.accounting.services;
 
-import com.sepidar.accounting.models.administrative_divisions.AdministrativeDivisionDTO;
+import com.sepidar.accounting.models.administrative_divisions.AdministrativeDivision;
 import com.sepidar.accounting.models.authentication.DeviceRegisterResponseDTO;
 import com.sepidar.accounting.models.authentication.LoginResponse;
 import com.sepidar.accounting.models.bank.Bank;
@@ -34,7 +34,7 @@ import java.util.List;
 public interface SepidarService {
 
     static SepidarService getInstance(SepidarConfiguration configuration) {
-        return new SepidarServiceImpl(configuration);
+        return new SepidarServiceImpl(configuration.getApiVersion(), configuration.getUrl(), configuration.getDeviceId());
     }
 
     DeviceRegisterResponseDTO register();
@@ -45,7 +45,7 @@ public interface SepidarService {
 
     GenerationVersion getGenerationVersion();
 
-    List<AdministrativeDivisionDTO> getAdministrativeDivisions(String xmlString, String token);
+    List<AdministrativeDivision> getAdministrativeDivisions(String xmlString, String token);
 
     List<CustomerGrouping> getCustomerGroupings(String xmlString, String token);
 
