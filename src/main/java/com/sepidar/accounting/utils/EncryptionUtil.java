@@ -73,7 +73,7 @@ public class EncryptionUtil {
     }
 
     public static String rsaEncryptionForUUID(byte[] rsaModulus, byte[] rsaExponent, UUID raw) {
-        byte[] uuidBytes = DatatypeConverter.parseHexBinary(Long.toHexString(raw.getMostSignificantBits()) + Long.toHexString(raw.getLeastSignificantBits()));
+        byte[] uuidBytes = DatatypeConverter.parseHexBinary(raw.toString().replace("-", ""));
         try {
             PublicKey rsaPublicKeySpec = new RSAPublicKeyImpl(new BigInteger(1, rsaModulus), new BigInteger(1, rsaExponent));
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");

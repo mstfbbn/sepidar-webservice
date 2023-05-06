@@ -150,7 +150,7 @@ public class SepidarServiceImpl implements SepidarService {
         }
 
         Call<DeviceRegisterResponse> deviceRegisterResponseCall = getSepidarApi().deviceRegister(
-                new DeviceRegisterRequest(
+                DeviceRegisterRequest.of(
                         cypher,
                         ivBase64Encoded,
                         getIntegrationId()
@@ -196,7 +196,7 @@ public class SepidarServiceImpl implements SepidarService {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, rsaPublicKeyXmlString, null);
         Call<LoginResponse> call = getSepidarApi().userLogin(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(),
-                new LoginRequest(
+                LoginRequest.of(
                         username,
                         EncryptionUtil.md5Encrypt(password)
                 )
