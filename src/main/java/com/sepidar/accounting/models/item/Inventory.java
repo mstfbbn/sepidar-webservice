@@ -14,8 +14,8 @@ public class Inventory {
     @SerializedName("TracingRef")
     private Integer tracingRef;
 
-    @SerializedName("StocksRef")
-    private Integer stocksRef; // TODO: check name
+    @SerializedName("StockeRef")
+    private Integer stocksRef;
 
     @SerializedName("Quantity")
     private Double quantity;

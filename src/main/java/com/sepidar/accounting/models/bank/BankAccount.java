@@ -12,10 +12,10 @@ public class BankAccount {
     private Integer bankAccountId;
 
     @SerializedName("DlCode")
-    private String diCode;
+    private String dlCode;
 
     @SerializedName("DlTitle")
-    private String diTitle;
+    private String dlTitle;
 
     @SerializedName("CurrencyRef")
     private Integer currencyRef;

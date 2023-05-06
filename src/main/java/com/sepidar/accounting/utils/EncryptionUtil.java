@@ -2,7 +2,6 @@ package com.sepidar.accounting.utils;
 
 import com.sepidar.accounting.exceptions.SepidarGlobalException;
 import lombok.extern.slf4j.Slf4j;
-import sun.security.rsa.RSAPublicKeyImpl;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -12,10 +11,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -37,7 +34,7 @@ public class EncryptionUtil {
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 1, e.getMessage());
         }
     }
 
@@ -50,7 +47,7 @@ public class EncryptionUtil {
             return new String(cipher.doFinal(encrypted));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 1, e.getMessage());
         }
     }
 
@@ -68,20 +65,23 @@ public class EncryptionUtil {
             return DatatypeConverter.printHexBinary(digest).toUpperCase();
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error(e.getMessage(), e);
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 1, e.getMessage());
         }
     }
 
     public static String rsaEncryptionForUUID(byte[] rsaModulus, byte[] rsaExponent, UUID raw) {
         byte[] uuidBytes = DatatypeConverter.parseHexBinary(raw.toString().replace("-", ""));
         try {
-            PublicKey rsaPublicKeySpec = new RSAPublicKeyImpl(new BigInteger(1, rsaModulus), new BigInteger(1, rsaExponent));
+            BigInteger modulus = new BigInteger(1, rsaModulus), exponent = new BigInteger(1, rsaExponent);
+            RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            PublicKey rsaPublicKeySpec = factory.generatePublic(spec);
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKeySpec);
             return Base64.getEncoder().encodeToString(cipher.doFinal(uuidBytes));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 0, e.getMessage());
+            throw new SepidarGlobalException(HttpURLConnection.HTTP_INTERNAL_ERROR, 1, e.getMessage());
         }
     }
 }

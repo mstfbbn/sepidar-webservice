@@ -18,6 +18,7 @@ import com.sepidar.accounting.models.general.GenerationVersion;
 import com.sepidar.accounting.models.invoice.Invoice;
 import com.sepidar.accounting.models.invoice.InvoiceBatch;
 import com.sepidar.accounting.models.invoice.InvoiceBatchResult;
+import com.sepidar.accounting.models.invoice.InvoiceNewOnQuotation;
 import com.sepidar.accounting.models.item.Inventory;
 import com.sepidar.accounting.models.item.Item;
 import com.sepidar.accounting.models.price_note.PriceNoteItem;
@@ -132,7 +133,7 @@ public interface SepidarApiProxy {
     Call<List<InvoiceBatchResult>> createInvoiceBatch(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization, @Body List<InvoiceBatch> invoiceBatchList);
 
     @POST("/api/Invoices/BasedOnQuotation/")
-    Call<Invoice> createInvoiceBasedOnQuotation(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization, @Body Integer quotationId);
+    Call<Invoice> createInvoiceBasedOnQuotation(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization, @Body InvoiceNewOnQuotation invoiceNewOnQuotation);
 
     @GET("/api/banks/")
     Call<List<Bank>> getBanks(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);

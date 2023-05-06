@@ -6,7 +6,7 @@
 
     <groupId>com.sepidar</groupId>
     <artifactId>accounting</artifactId>
-    <version>0.1</version>
+    <version>1.0</version>
     <description>Sepidar accounting system webservice implementation</description>
 
     <developers>

@@ -20,6 +20,7 @@ import com.sepidar.accounting.models.general.GenerationVersion;
 import com.sepidar.accounting.models.invoice.Invoice;
 import com.sepidar.accounting.models.invoice.InvoiceBatch;
 import com.sepidar.accounting.models.invoice.InvoiceBatchResult;
+import com.sepidar.accounting.models.invoice.InvoiceNewOnQuotation;
 import com.sepidar.accounting.models.item.Inventory;
 import com.sepidar.accounting.models.item.Item;
 import com.sepidar.accounting.models.price_note.PriceNoteItem;
@@ -447,7 +448,7 @@ public class SepidarServiceImpl implements SepidarService {
     public Invoice createInvoiceBasedOnQuotation(String xmlString, String token, Integer quotationId) {
         String requestId = UUID.randomUUID().toString();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
-        Call<Invoice> call = getSepidarApi().createInvoiceBasedOnQuotation(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), quotationId);
+        Call<Invoice> call = getSepidarApi().createInvoiceBasedOnQuotation(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken(), InvoiceNewOnQuotation.of(quotationId));
         return handleApiCallWithReturn(call, requestId);
     }
 
