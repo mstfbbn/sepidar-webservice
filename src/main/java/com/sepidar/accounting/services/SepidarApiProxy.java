@@ -27,6 +27,7 @@ import com.sepidar.accounting.models.quotation.BatchResult;
 import com.sepidar.accounting.models.quotation.Quotation;
 import com.sepidar.accounting.models.quotation.QuotationBatch;
 import com.sepidar.accounting.models.quotation.QuotationBatchResult;
+import com.sepidar.accounting.models.sale_type.SaleType;
 import com.sepidar.accounting.models.stock.Stock;
 import com.sepidar.accounting.models.unit.Unit;
 import retrofit2.Call;
@@ -83,6 +84,9 @@ public interface SepidarApiProxy {
 
     @GET("/api/Items/Inventories/")
     Call<List<Inventory>> getInventories(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);
+
+    @GET("/api/SaleTypes")
+    Call<List<SaleType>> getSaleTypes(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);
 
     @GET("/api/PriceNoteItems")
     Call<List<PriceNoteItem>> getPriceNoteItems(@Header("GenerationVersion") String generationVersion, @Header("IntegrationID") String IntegrationID, @Header("ArbitraryCode") String arbitraryCode, @Header("EncArbitraryCode") String encArbitraryCode, @Header("Authorization") String authorization);

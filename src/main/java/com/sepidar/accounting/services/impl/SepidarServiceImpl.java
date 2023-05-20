@@ -29,6 +29,7 @@ import com.sepidar.accounting.models.quotation.BatchResult;
 import com.sepidar.accounting.models.quotation.Quotation;
 import com.sepidar.accounting.models.quotation.QuotationBatch;
 import com.sepidar.accounting.models.quotation.QuotationBatchResult;
+import com.sepidar.accounting.models.sale_type.SaleType;
 import com.sepidar.accounting.models.stock.Stock;
 import com.sepidar.accounting.models.unit.Unit;
 import com.sepidar.accounting.services.SepidarApiProxy;
@@ -36,6 +37,7 @@ import com.sepidar.accounting.services.SepidarService;
 import com.sepidar.accounting.utils.EncryptionUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -50,6 +52,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * NOTE: every method assumes that configuration details are set before.
@@ -317,6 +320,14 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     @Override
+    public List<SaleType> getSaleTypes(String xmlString, String token) {
+        String requestId = getRandomUniqueId();
+        SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
+        Call<List<SaleType>> call = getSepidarApi().getSaleTypes(headers.getGenerationVersion(), headers.getIntegrationId(), headers.getArbitraryCode(), headers.getArbitraryCodeEncoded(), headers.getToken());
+        return handleApiCallWithReturn(call, requestId);
+    }
+
+    @Override
     public List<PriceNoteItem> getPriceNoteItems(String xmlString, String token) {
         String requestId = getRandomUniqueId();
         SepidarRequestHeader headers = getRequestHeader(requestId, xmlString, token);
@@ -489,9 +500,15 @@ public class SepidarServiceImpl implements SepidarService {
     }
 
     private SepidarApiProxy getSepidarApi() {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.MINUTES)
+                .readTimeout(10, TimeUnit.MINUTES)
+                .writeTimeout(10, TimeUnit.MINUTES)
+                .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
         return retrofit.create(SepidarApiProxy.class);
     }

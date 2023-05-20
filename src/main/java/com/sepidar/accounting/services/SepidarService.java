@@ -25,6 +25,7 @@ import com.sepidar.accounting.models.quotation.BatchResult;
 import com.sepidar.accounting.models.quotation.Quotation;
 import com.sepidar.accounting.models.quotation.QuotationBatch;
 import com.sepidar.accounting.models.quotation.QuotationBatchResult;
+import com.sepidar.accounting.models.sale_type.SaleType;
 import com.sepidar.accounting.models.stock.Stock;
 import com.sepidar.accounting.models.unit.Unit;
 import com.sepidar.accounting.services.impl.SepidarServiceImpl;
@@ -68,6 +69,8 @@ public interface SepidarService {
     String getItemImage(String xmlString, String token, Integer itemId);
 
     List<Inventory> getInventories(String xmlString, String token);
+
+    List<SaleType> getSaleTypes(String xmlString, String token);
 
     List<PriceNoteItem> getPriceNoteItems(String xmlString, String token);
 
