@@ -43,7 +43,7 @@ public class Customer {
     @SerializedName("BirthDate")
     private String birthDate;
 
-    @SerializedName("NationalId")
+    @SerializedName("NationalID")
     private String nationalId;
 
     @SerializedName("EconomicCode")
